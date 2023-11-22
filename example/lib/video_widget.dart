@@ -16,18 +16,19 @@ class _VideoWidgetState extends State<VideoWidget> {
   late Future<void> _initializeVideoPlayerFuture;
 
   @override
-  void initState() {
-    super.initState();
-    _controller = VideoPlayerController.network(widget.url);
-    _initializeVideoPlayerFuture = _controller.initialize().then((_) {
-      // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
-      setState(() {});
-    });
-
-    if (widget.play) {
-      _controller.play();
-      _controller.setLooping(true);
-    }
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: _initializeVideoPlayerFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return VideoPlayer(_controller);
+        } else {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      },
+    );
   }
 
   @override
@@ -50,18 +51,17 @@ class _VideoWidgetState extends State<VideoWidget> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _initializeVideoPlayerFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          return VideoPlayer(_controller);
-        } else {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-      },
-    );
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url));
+    _initializeVideoPlayerFuture = _controller.initialize().then((_) {
+      // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+      setState(() {});
+    });
+
+    if (widget.play) {
+      _controller.play();
+      _controller.setLooping(true);
+    }
   }
 }

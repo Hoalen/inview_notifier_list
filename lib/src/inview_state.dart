@@ -35,16 +35,6 @@ class InViewState extends ChangeNotifier {
     _contexts.add(WidgetData(context: context, id: id));
   }
 
-  void removeContext({required BuildContext context}) {
-    _contexts.removeWhere((d) => d.context == context);
-  }
-
-  void removeContexts(int letRemain) {
-    if (_contexts.length > letRemain) {
-      _contexts = _contexts.skip(_contexts.length - letRemain).toSet();
-    }
-  }
-
   ///Checks if the widget with the `id` is currently in-view or not.
   bool inView(String id) {
     return _currentInViewIds.contains(id);
@@ -65,7 +55,7 @@ class InViewState extends ChangeNotifier {
 
       //Retrieve the viewport related to the scroll area
       final RenderAbstractViewport viewport =
-          RenderAbstractViewport.of(renderObject)!;
+          RenderAbstractViewport.of(renderObject);
       final double vpHeight = notification.metrics.viewportDimension;
       final RevealedOffset vpOffset =
           viewport.getOffsetToReveal(renderObject, 0.0);
@@ -96,5 +86,15 @@ class InViewState extends ChangeNotifier {
         }
       }
     });
+  }
+
+  void removeContext({required BuildContext context}) {
+    _contexts.removeWhere((d) => d.context == context);
+  }
+
+  void removeContexts(int letRemain) {
+    if (_contexts.length > letRemain) {
+      _contexts = _contexts.skip(_contexts.length - letRemain).toSet();
+    }
   }
 }
